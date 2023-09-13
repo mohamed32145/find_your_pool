@@ -1,6 +1,6 @@
 class Manager:
     id = 1
-    def __init__(self , name=None , age=None , salary=None, headpools = None  ):
+    def __init__(self , name = None , age = None , salary = None, headpools = None  ):
         super().__init__()
         self.id += 1
         self.age = age
@@ -43,13 +43,54 @@ class Pool:
 class kidspool(Pool):
     def __init__(self, depth, width, length , maxage , isneeded, costumersOfToday = None ):
         super().__init__(depth, width, length , costumersOfToday)
-        self.maxage=maxage
-        self.isneeded=isneeded
+        self.maxage = maxage
+        self.isneeded = isneeded
 
     def __str__(self):
         man = "none" if self.manager.id == 0 else str(self.manager.id)
         return f"Pool [code={self.code}, depth={self.depth}, width={self.width}, length={self.length}, " \
                f"costumers_of_today={self.costumersOfToday},maxage={self.maxage},isneeded={self.isneeded} manager_code={man}]"
+
+class proffeional_pool(Pool):
+    def __init__(self, depth, width, length, swimming_lines, olympicGamesNames = None ,costumersOfToday = None):
+        super().__init__(depth, width, length, costumersOfToday)
+        self.swimming_lines = swimming_lines
+        self.olympicGamesNames = olympicGamesNames if olympicGamesNames is not None else []
+
+    def __str__(self):
+        return super().__str__() + f" a swimming lines are {self.swimming_lines} the olympic Games Names are {self.olympicGamesNames} "
+
+
+
+
+
+class bracelet:
+    code = 1
+    def __int__(self, customer_name, pools_of_today=None ):
+        super().__init__()
+        self.customer_name=customer_name
+        self.pools_of_today= pools_of_today if pools_of_today is not None else []
+
+    def add_pool(self, pool):
+        if pool is None:
+            return False
+        if pool in self.pools_of_today:
+            return True
+        self.pools_of_today.append(pool)
+        return True
+    def __str__(self):
+        return f" bracelet is [the code is{self.code}, the name is {self.customer_name} , adn the visited pools are" \
+               f" {self.pools_of_today}]"
+
+
+
+
+
+
+
+
+
+
 
 
 
