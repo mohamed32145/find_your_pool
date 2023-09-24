@@ -1,4 +1,4 @@
-# python_oop
+# pools_system_management
 I am currently working on this 
 rewriting the final project of oop course which was written in java language
 
