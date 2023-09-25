@@ -34,9 +34,9 @@ if __name__ == '__main__':
 #     add to datasystem
 
 
-    b1= bracelet('Oscar Pistorius')
-    b2= bracelet("Svetlana Romashina")
-    b3= bracelet("Katie Ledecky")
+    b1= bracelet('Oscar Pistorius',55)
+    b2= bracelet("Svetlana Romashina",43)
+    b3= bracelet("Katie Ledecky",25)
 
 
 #     add to datasystemD

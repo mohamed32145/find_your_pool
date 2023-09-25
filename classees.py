@@ -59,10 +59,11 @@ class proffeional_pool(Pool):
 class bracelet:
     code = 1
 
-    def __init__(self, customer_name, pools_of_today=None):
+    def __init__(self, customer_name, age, pools_of_today=None):
         super().__init__()
         self.customer_name = customer_name
         self.pools_of_today = pools_of_today if pools_of_today is not None else []
+        self.age = age
         self.code += 1
 
     def add_pool(self, pool):
@@ -74,5 +75,6 @@ class bracelet:
         return True
 
     def __str__(self):
-        return f" bracelet is [the code is{self.code}, the name is {self.customer_name} , adn the visited pools are" \
+        return f" bracelet is [the code is{self.code}, the name is {self.customer_name} ,the age is{self.age} " \
+               f"adn the visited pools are" \
                f" {self.pools_of_today}]"
