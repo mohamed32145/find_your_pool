@@ -3,5 +3,7 @@ I am currently working on this
 rewriting the final project of oop course which was written in java language
 
 goals:
-Buidling simple website using flask//
-connecting to database 
+Buidling simple website using fastAPI
+connecting to sql server database / Aws S3
+
+
