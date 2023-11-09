@@ -3,15 +3,25 @@ class Manager:
 
     def __init__(self, name=None, age=None, salary=None, headpools=None):
         super().__init__()
-        self.id += 1
+        self.id = Manager.id
+        Manager.id += 1
         self.age = age
         self.name = name
         self.salary = salary
         self.headpools = headpools if headpools is not None else []
 
+    def add_pool(self, pool):
+        if pool is None:
+            return False
+        if pool in self.headpools:
+            return True
+        self.headpools.append(pool)
+        return True
+
     def __str__(self):
+        temp = [p.code for p in self.headpools]
         return f'manager [id={self.id}, age={self.age}, name={self.name}, salary={self.salary}, ' \
-               f'headpools={self.headpools}]'
+               f'headpools={temp}]'
 
 
 class Pool:
@@ -22,16 +32,26 @@ class Pool:
         self.depth = depth
         self.width = width
         self.length = length
-        self.code += 1
+        self.code = Pool.code
+        Pool.code += 1
         # the default value of costumersOfToday is none , if we passed actual list or cutomers we done, another
         # costumersOfToday equal to [] empty list
         self.costumersOfToday = costumersOfToday if costumersOfToday is not None else []
         self.manager = Manager()
 
+    def add_customer(self, brac):
+        if brac is None:
+            return False
+        if brac in self.costumersOfToday:
+            return True
+        self.costumersOfToday.append(brac)
+        return True
+
     def __str__(self):
+        temp = [b.code for b in self.costumersOfToday]
         man = "none" if self.manager.id == 0 else str(self.manager.id)
         return f"Pool [code={self.code}, depth={self.depth}, width={self.width}, length={self.length}, " \
-               f"costumers_of_today={self.costumersOfToday}, manager_code={man}]"
+               f"costumers_of_today={temp}, manager_code={man}]"
 
 
 class kidspool(Pool):
@@ -41,9 +61,10 @@ class kidspool(Pool):
         self.isneeded = isneeded
 
     def __str__(self):
-        man = "none" if self.manager.id == 0 else str(self.manager.id)
-        return f"Pool [code={self.code}, depth={self.depth}, width={self.width}, length={self.length}, " \
-               f"costumers_of_today={self.costumersOfToday},maxage={self.maxage},isneeded={self.isneeded} manager_code={man}]"
+        # man = "none" if self.manager.id == 0 else str(self.manager.id)
+        parent_str = super().__str__()
+        child_str = f" maxage={self.maxage},isneeded={self.isneeded} "
+        return parent_str + child_str
 
 
 class proffeional_pool(Pool):
@@ -64,7 +85,8 @@ class bracelet:
         self.customer_name = customer_name
         self.pools_of_today = pools_of_today if pools_of_today is not None else []
         self.age = age
-        self.code += 1
+        self.code = bracelet.code
+        bracelet.code += 1
 
     def add_pool(self, pool):
         if pool is None:
@@ -75,6 +97,7 @@ class bracelet:
         return True
 
     def __str__(self):
-        return f" bracelet is [the code is{self.code}, the name is {self.customer_name} ,the age is{self.age} " \
-               f"adn the visited pools are" \
-               f" {self.pools_of_today}]"
+        temp = [p.code for p in self.pools_of_today]
+        return f" bracelet is [the code is {self.code}, the name is {self.customer_name} ,the age is {self.age} " \
+               f"and the visited pools are" \
+               f" {temp}]"
