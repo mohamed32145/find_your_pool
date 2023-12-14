@@ -18,6 +18,13 @@ class Manager:
         self.headpools.append(pool)
         return True
 
+    def __eq__(self, other):
+        if isinstance(other, Manager):
+            return self.id == other.id
+        return False
+
+
+
     def __str__(self):
         temp = [p.code for p in self.headpools]
         return f'manager [id={self.id}, age={self.age}, name={self.name}, salary={self.salary}, ' \
@@ -74,7 +81,7 @@ class proffeional_pool(Pool):
         self.olympicGamesNames = olympicGamesNames if olympicGamesNames is not None else []
 
     def __str__(self):
-        return super().__str__() + f" a swimming lines are {self.swimming_lines} the olympic Games Names are {self.olympicGamesNames} "
+        return super().__str__() + f" a swimming lines are {self.swimming_lines} the olympic Games Names are {self.olympicGamesNames}"
 
 
 class bracelet:

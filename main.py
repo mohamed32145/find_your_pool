@@ -1,13 +1,23 @@
+import systemdatabase
 from classees import *
 from systemdatabase import *
-from fastapi import FastAPI
+from fastapi import FastAPI,Request
 from typing import Union
+from fastapi.templating import Jinja2Templates
 
 
 # dont forget to build the sql server database for this project
 
 if __name__ == '__main__':
-    sd = database()
+    db_params = {
+            'dbname': 'pools_mall',
+            'user': 'postgres',
+            'password': '123987zxcoiu',
+            'host': 'localhost',
+            'port': '5432'
+        }
+
+    sd = database(db_params)
 
     p1 = Pool(2, 2, 5)
     p2 = Pool(3, 2, 5)
@@ -92,9 +102,17 @@ if __name__ == '__main__':
 
     m1 = Manager("martin", 47, 13000)
     m2 = Manager("alex", 37, 11000)
+    m3 = Manager("yaseen", 28, 9000)
+    m4 = Manager("taha", 28, 9000)
+
 
     sd.addmanager(m1)
     sd.addmanager(m2)
+    sd.addmanager(m3)
+    sd.addmanager(m4)
+
+
+
 
     m1.add_pool(p1)
     m1.add_pool(pp1)
@@ -114,10 +132,35 @@ if __name__ == '__main__':
     sd.poolcode_manager_dic[p2.code] = m2
     sd.poolcode_manager_dic[pp3.code] = m2
 
-    sd.print_manager_pools(m2)
+
+##########################################  connecting to postgresql uding psycopg2  #############################################3#
+
+# Database connection string for PostgreSQL
 
 
-##########################################################start fastAPI ################################################
+connection = sd.connection
+cursor = sd.cursor
+
+
+
+
+connection.commit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################################################## start fastAPI ################################################
+
+pooles = []
 
 app = FastAPI()
 
@@ -131,3 +174,14 @@ def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
 
 
+
+# to add a pool to pooles
+@app.post("/add_pool/")
+async def add_pool(length: float, width: float, depth: float):
+    new_pool = Pool(length, width, depth)
+    pooles.append(new_pool)
+    print(len(pooles))
+    return {"message": "Pool added successfully"}
+
+
+print(pooles)
