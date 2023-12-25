@@ -1,0 +1,20 @@
+from fastapi import FastAPI, Request
+from typing import Union
+from fastapi.templating import Jinja2Templates
+from classees import *
+from systemdatabase import *
+
+if __name__ == '__main__':
+    db_params = {
+        'dbname': 'pools_mall',
+        'user': 'postgres',
+        'password': '123987zxcoiu',
+        'host': 'localhost',
+        'port': '5432'
+    }
+
+    sd = database(db_params)
+    app = FastAPI()
+
+
+

@@ -1,21 +1,57 @@
+import uvicorn
+
 import systemdatabase
 from classees import *
 from systemdatabase import *
-from fastapi import FastAPI,Request
+from fastapi import FastAPI, Request
 from typing import Union
 from fastapi.templating import Jinja2Templates
+import uvicorn
 
 
-# dont forget to build the sql server database for this project
+class fasti:
+
+    def __init__(self):
+        self.app = FastAPI()
+        self.setup_routes()
+
+    def setup_routes(self):
+
+        @self.app.get("/")
+        async def read_root():
+            return {"hello": "this is my first webo"}
+
+        @self.app.get("/items/{item_id}")
+        async def read_item(item_id: int, q: Union[str, None] = None):
+            return {"item_id": item_id, "q": q}
+
+        # to add a pool to pooles
+        @self.app.post("/add_pool/")
+        async def add_pool(length: float, width: float, depth: float):
+            new_pool = Pool(length, width, depth)
+            pooles.append(new_pool)
+            print(len(pooles))
+            return {"message": "Pool added successfully"}
+
+        @self.app.post("/addbracelet/")
+        async def add_brac(customer_name: str, age: int, code: str):
+            brac = bracelet(customer_name, age, code)
+            result = sd.addbracelet(brac)
+            return result
+
+    # sd.close_connection()
+    def run_app(self):
+        uvicorn.run(self.app, host="127.0.0.1", port=8001)
+
 
 if __name__ == '__main__':
     db_params = {
-            'dbname': 'pools_mall',
-            'user': 'postgres',
-            'password': '123987zxcoiu',
-            'host': 'localhost',
-            'port': '5432'
-        }
+        'dbname': 'pools_mall',
+        'user': 'postgres',
+        'password': '123987zxcoiu',
+        'host': 'localhost',
+        'port': '5432'
+    }
 
     sd = database(db_params)
 
@@ -105,14 +141,10 @@ if __name__ == '__main__':
     m3 = Manager("yaseen", 28, 9000)
     m4 = Manager("taha", 28, 9000)
 
-
     sd.addmanager(m1)
     sd.addmanager(m2)
     sd.addmanager(m3)
     sd.addmanager(m4)
-
-
-
 
     m1.add_pool(p1)
     m1.add_pool(pp1)
@@ -132,56 +164,9 @@ if __name__ == '__main__':
     sd.poolcode_manager_dic[p2.code] = m2
     sd.poolcode_manager_dic[pp3.code] = m2
 
-
-##########################################  connecting to postgresql uding psycopg2  #############################################3#
-
-# Database connection string for PostgreSQL
-
-
-connection = sd.connection
-cursor = sd.cursor
+    pooles = []
+    instance = fasti()
+    instance.run_app()
 
 
 
-
-connection.commit()
-
-
-
-
-
-
-
-
-
-
-
-
-
-########################################################## start fastAPI ################################################
-
-pooles = []
-
-app = FastAPI()
-
-@app.get("/")
-async def read_root():
-    return {"hello": "this is my first webo"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-
-
-# to add a pool to pooles
-@app.post("/add_pool/")
-async def add_pool(length: float, width: float, depth: float):
-    new_pool = Pool(length, width, depth)
-    pooles.append(new_pool)
-    print(len(pooles))
-    return {"message": "Pool added successfully"}
-
-
-print(pooles)

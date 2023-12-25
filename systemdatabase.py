@@ -61,7 +61,6 @@ class database:
             print(f"Error: {e}")
         finally:
             # Close the cursor in the finally block to ensure it's always closed
-            # self.cursor.close()
             return
 
 
