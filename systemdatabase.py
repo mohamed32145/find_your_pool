@@ -1,8 +1,6 @@
 from classees import *
 import psycopg2
 
-
-
 db_params = {
     'dbname': 'pools_mall',
     'user': 'postgres',
@@ -21,8 +19,6 @@ class database:
         self.connection = psycopg2.connect(**db_params)
         self.cursor = self.connection.cursor()
 
-
-
     def addpool(self, pool):
         if pool is None:
             return False
@@ -33,15 +29,11 @@ class database:
             self.pools_list.append(pool)
             return True
 
-    # def addpool(self, pool):
-    #
-    #     try:
-    #         #if pool code already exist
-    #         self.cursor.execute("SELECT code from pool)
+
 
     def addbracelet(self, brac):
         try:
-            #check if customer code exists
+            # check if customer code exists
             self.cursor.execute("SELECT code FROM bracelet WHERE code = %s", (brac.code,))
             exist_code = self.cursor.fetchone()
 
@@ -50,11 +42,11 @@ class database:
                 print(f"braclet with code {brac.code} already exists. You may want to update instead.")
 
             else:
-                 #insert it
-                 self.code_brac_dic[brac.code] = brac
-                 self.cursor.execute("INSERT INTO bracelet (code, customer_name, age) VALUES (%s, %s, %s)",
-                                     (brac.code, brac.customer_name, brac.age))
-                 self.connection.commit()
+                # insert it
+                self.code_brac_dic[brac.code] = brac
+                self.cursor.execute("INSERT INTO bracelet (code, customer_name, age) VALUES (%s, %s, %s)",
+                                    (brac.code, brac.customer_name, brac.age))
+                self.connection.commit()
 
         except Exception as e:
             # Handle exceptions
@@ -62,9 +54,6 @@ class database:
         finally:
             # Close the cursor in the finally block to ensure it's always closed
             return
-
-
-
 
     def addmanager(self, manager):
         try:
@@ -114,8 +103,8 @@ class database:
         for key, value in self.poolcode_manager_dic.items():
             if value is m:
                 pcode = key
-                p= self.findpoolbyid(pcode)
-                i+= 1
+                p = self.findpoolbyid(pcode)
+                i += 1
                 toreturn.append(p)
                 print(f" {i}. {p}")
 
@@ -127,27 +116,3 @@ class database:
     def close_connection(self):
         self.cursor.close()
         self.connection.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-

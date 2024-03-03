@@ -5,11 +5,11 @@ from classees import *
 from systemdatabase import *
 from fastapi import FastAPI, Request
 from typing import Union
-from fastapi.templating import Jinja2Templates
 import uvicorn
 
 
 class fasti:
+
 
     def __init__(self):
         self.app = FastAPI()
@@ -30,13 +30,25 @@ class fasti:
         async def add_pool(length: float, width: float, depth: float):
             new_pool = Pool(length, width, depth)
             pooles.append(new_pool)
-            print(len(pooles))
             return {"message": "Pool added successfully"}
 
+        # get pool details by its code
+        @self.app.get("/get_pool/")
+        async def get_pool(code: int):
+            p = sd.findpoolbyid(code)
+            return {f"pool code is {p.code} and the pool depth is {p.depth} its length is {p.length} and the width is {p.width} "}
+
+
+
         @self.app.post("/addbracelet/")
-        async def add_brac(customer_name: str, age: int, code: str):
+        async def add_brac(request: Request):
+            data = await request.json()
+            customer_name = data.get("customer_name")
+            age = data.get("age")
+            code = data.get("code")
             brac = bracelet(customer_name, age, code)
             result = sd.addbracelet(brac)
+            print("new customer was added")
             return result
 
     # sd.close_connection()
@@ -166,6 +178,7 @@ if __name__ == '__main__':
 
     pooles = []
     instance = fasti()
+    # templates = Jinja2Templates(directory="templates")
     instance.run_app()
 
 
