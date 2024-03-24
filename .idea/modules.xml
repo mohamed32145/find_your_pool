@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/oop_python.iml" filepath="$PROJECT_DIR$/.idea/oop_python.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/pool_mallService.iml" filepath="$PROJECT_DIR$/.idea/pool_mallService.iml" />
     </modules>
   </component>
 </project>

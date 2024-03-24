@@ -1,4 +1,4 @@
-from classees import *
+from app.models.classees import *
 import psycopg2
 
 db_params = {
