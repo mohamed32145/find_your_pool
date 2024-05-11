@@ -1,5 +1,5 @@
-from app.models.classees import *
 import psycopg2
+from app.models.classees import *
 
 db_params = {
     'dbname': 'pools_mall',

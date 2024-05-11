@@ -1,7 +1,11 @@
-from systemdatabase import *
+import app.models.systemdatabase
+from app.models.systemdatabase import *
 from fastapi import FastAPI, Request
 from typing import Union
 import uvicorn
+
+from app.models.classees import *
+
 
 
 class fasti:
@@ -61,8 +65,8 @@ if __name__ == '__main__':
         'port': '5432'
     }
 
+    # sd = app.models.systemdatabase.database(db_params)
     sd = database(db_params)
-
     p1 = Pool(2, 2, 5)
     p2 = Pool(3, 2, 5)
     p3 = Pool(2, 2, 5)
@@ -174,7 +178,6 @@ if __name__ == '__main__':
 
     pooles = []
     instance = fasti()
-    # templates = Jinja2Templates(directory="templates")
     instance.run_app()
 
 
