@@ -1,13 +1,20 @@
-class Manager:
-    id = 1
 
-    def __init__(self, name=None, age=None, salary=None, headpools=None):
+class Manager:
+    def __init__(self, id, name=None, age=None, salary=None, headpools=None):
         super().__init__()
-        self.id = Manager.id
-        Manager.id += 1
+        self.id = id
+
+        # Validate that age is either None or an integer
+        if age is not None and not isinstance(age, int):
+            raise ValueError("Age must be an integer or None")
         self.age = age
-        self.name = name
+
+        # Validate that salary is either None or an integer
+        if salary is not None and not isinstance(salary, int):
+            raise ValueError("Salary must be an integer or None")
         self.salary = salary
+
+        self.name = name
         self.headpools = headpools if headpools is not None else []
 
     def add_pool(self, pool):
@@ -23,47 +30,35 @@ class Manager:
             return self.id == other.id
         return False
 
-
-
     def __str__(self):
         temp = [p.code for p in self.headpools]
         return f'manager [id={self.id}, age={self.age}, name={self.name}, salary={self.salary}, ' \
                f'headpools={temp}]'
 
 
+
 class Pool:
     code = 1
 
-    def __init__(self, depth, width, length, costumersOfToday=None):
+    def __init__(self, depth, width, length, managerid):
         super().__init__()
         self.depth = depth
         self.width = width
         self.length = length
         self.code = Pool.code
+        self.managerid= managerid
         Pool.code += 1
-        # the default value of costumersOfToday is none , if we passed actual list or cutomers we done, another
-        # costumersOfToday equal to [] empty list
-        self.costumersOfToday = costumersOfToday if costumersOfToday is not None else []
-        self.manager = Manager()
 
-    def add_customer(self, brac):
-        if brac is None:
-            return False
-        if brac in self.costumersOfToday:
-            return True
-        self.costumersOfToday.append(brac)
-        return True
+
 
     def __str__(self):
-        temp = [b.code for b in self.costumersOfToday]
-        man = "none" if self.manager.id == 0 else str(self.manager.id)
         return f"Pool [code={self.code}, depth={self.depth}, width={self.width}, length={self.length}, " \
-               f"costumers_of_today={temp}, manager_code={man}]"
+               f" manager_code={self.managerid}]"
 
 
 class kidspool(Pool):
-    def __init__(self, depth, width, length, maxage, isneeded, costumersOfToday=None):
-        super().__init__(depth, width, length, costumersOfToday)
+    def __init__(self, depth, width, length, maxage, managerid,  isneeded):
+        super().__init__(depth, width, length, managerid)
         self.maxage = maxage
         self.isneeded = isneeded
 
@@ -75,8 +70,8 @@ class kidspool(Pool):
 
 
 class proffeional_pool(Pool):
-    def __init__(self, depth, width, length, swimming_lines, olympicGamesNames=None, costumersOfToday=None):
-        super().__init__(depth, width, length, costumersOfToday)
+    def __init__(self, depth, width, length,managerid, swimming_lines, olympicGamesNames=None):
+        super().__init__(depth, width, length, managerid)
         self.swimming_lines = swimming_lines
         self.olympicGamesNames = olympicGamesNames if olympicGamesNames is not None else []
 
@@ -85,15 +80,13 @@ class proffeional_pool(Pool):
 
 
 class bracelet:
-    code = 1
-
-    def __init__(self, customer_name, age, pools_of_today=None):
+    def __init__(self, code,customer_name, age, pools_of_today=None):
         super().__init__()
         self.customer_name = customer_name
         self.pools_of_today = pools_of_today if pools_of_today is not None else []
         self.age = age
-        self.code = bracelet.code
-        bracelet.code += 1
+        self.code = code
+
 
     def add_pool(self, pool):
         if pool is None:
