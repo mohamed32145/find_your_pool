@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: pools_mall
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123987zxcoiu
+    ports:
+      - "5432:5432"  # Expose the PostgreSQL port
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # Persist datagit
+
+  app:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db  # Ensure the app starts after the database is ready
+
+# Correctly positioned volumes section
+volumes:
+  pgdata: {}  # Define a volume to persist PostgreSQL data
