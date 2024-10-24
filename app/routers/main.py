@@ -1,30 +1,26 @@
-from fastapi import FastAPI, Request
-from typing import Union
-import uvicorn
-from app.models import systemdatabase  # Import your database model
+from fastapi import FastAPI, Request,Depends
 from app.models.classees import *      # Import your classes as needed
+from app.models.schema import Pool
+from app.database import get_db, Base, engine
+from sqlalchemy.orm import Session
 
-# Initialize the FastAPI instance at the module level
+
+# Initialize  FastAPI
 app = FastAPI()
 
-# Set up your database connection parameters
-db_params = {
-    'dbname': 'pools_mall',
-    'user': 'postgres',
-    'password': '123987zxcoiu',
-    'host': 'db',
-    'port': '5432'
-}
+@app.on_event("startup")
+def startup_event():
+    Base.metadata.create_all(bind=engine)
 
-# 'host': 'localhost', when dealing with loal postgresql database
-sd = systemdatabase.database(db_params)
 
 # Define your routes
 @app.post("/add_pool/")
-async def add_pool(length: float, width: float, depth: float, managerid: int):
-    new_pool = Pool(length, width, depth, managerid)
-    sd.addpool(new_pool)
-    return {"message": "Pool added successfully"}
+async def add_pool(length: float, width: float, depth: float, managerid: int, db: Session = Depends(get_db)):
+    new_pool = Pool(length=length, width=width, depth=depth, manager_id=managerid)
+    db.add(new_pool)
+    db.commit()
+    db.refresh(new_pool)
+    return {"message": "Pool added successfully", "pool": new_pool}
 
 @app.get("/get_pool/")
 async def get_pool(poolcode: int):
@@ -49,6 +45,3 @@ async def add_manager(id: int, name: str, age: int, salary: int):
     response = sd.addmanager(manager)
     return response
 
-# Running the app directly using Uvicorn
-if __name__ == '__main__':
-    uvicorn.run(app, host="127.0.0.1", port=8001)

@@ -20,6 +20,8 @@ services:
       - "8000:8000"
     depends_on:
       - db  # Ensure the app starts after the database is ready
+    environment:
+      DATABASE_URL: "postgresql://postgres:123987zxcoiu@db:5432/pools_mall"
 
 # Correctly positioned volumes section
 volumes:
