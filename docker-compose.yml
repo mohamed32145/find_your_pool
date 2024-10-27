@@ -15,7 +15,7 @@ services:
   app:
     build: .
     volumes:
-      - .:/app
+      - .:/app # this to automate changes in the local to the conatiner
     ports:
       - "8000:8000"
     depends_on:

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request,Depends
-from app.models.classees import *      # Import your classes as needed
-from app.models.schema import Pool
+
+from app.models.schema import Pool,Bracelet, Manager
 from app.database import get_db, Base, engine
 from sqlalchemy.orm import Session
 
@@ -19,29 +19,37 @@ async def add_pool(length: float, width: float, depth: float, managerid: int, db
     new_pool = Pool(length=length, width=width, depth=depth, manager_id=managerid)
     db.add(new_pool)
     db.commit()
-    db.refresh(new_pool)
+    db.refresh(new_pool) # after this refresh new_pool will get the id which is generated automaticlly in postgre table
     return {"message": "Pool added successfully", "pool": new_pool}
 
 @app.get("/get_pool/")
-async def get_pool(poolcode: int):
-    try:
-        p = sd.findpoolbyid(poolcode)
-        if p is None:
-            return {"error": f"No pool found with code {poolcode}"}
-        return {
-            f"pool code is {p.code}, pool depth is {p.depth}, its length is {p.length}, and the width is {p.width}"}
-    except Exception as e:
-        return {"error": f"An error occurred: {str(e)}"}
+async def get_pool(poolcode: int, db: Session = Depends(get_db)):
+
+    pool = db.get(Pool, poolcode)
+    if pool:
+        return {"message": "Pool found successfully", "pool": pool}
+    else:
+        return {"message" : "this pool not found "}
 
 @app.post("/addbracelet/")
-async def add_brac(code: int, customer_name: str, age: int):
-    brac = bracelet(code, customer_name, age)
-    result = sd.addbracelet(brac)
-    return result
+async def add_brac(customer_name: str, age: int, db: Session = Depends(get_db)):
+    new_brac = Bracelet(customer_name=customer_name, age=age)
+    db.add(new_brac)
+    db.commit()
+    db.refresh(new_brac)
+
+    return {"message: ": "bracelete was added sucessfulyy", "brac": new_brac}
+
+
+
 
 @app.post("/addmanager/")
-async def add_manager(id: int, name: str, age: int, salary: int):
-    manager = Manager(id=id, name=name, age=age, salary=salary)
-    response = sd.addmanager(manager)
-    return response
+async def add_manager(name: str, age: int, salary: int, db: Session = Depends(get_db)):
+    manager = Manager( name=name, age=age, salary=salary)
+    db.add(manager)
+    db.commit()
+    db.refresh(manager)
+    return {"managere addes successfuly":manager}
+
+
 
