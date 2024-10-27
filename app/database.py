@@ -10,7 +10,7 @@ engine = create_engine(DATABASE_URL)
 # Create a session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Create a base class for declarative models
+# Create a base class for declarative models.py
 Base = declarative_base()
 
 # Dependency to get the DB session

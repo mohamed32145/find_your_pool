@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Request,Depends
-
 from app.models.schema import Pool,Bracelet, Manager
 from app.database import get_db, Base, engine
 from sqlalchemy.orm import Session
+from app.models.models import PoolSchema, PoolResponse
 
 
 # Initialize  FastAPI
@@ -13,14 +13,19 @@ def startup_event():
     Base.metadata.create_all(bind=engine)
 
 
-# Define your routes
-@app.post("/add_pool/")
-async def add_pool(length: float, width: float, depth: float, managerid: int, db: Session = Depends(get_db)):
-    new_pool = Pool(length=length, width=width, depth=depth, manager_id=managerid)
+
+@app.post("/add_pool/", response_model= PoolResponse)
+async def add_pool(length: float, width: float, depth: float, manager_id: int, db: Session = Depends(get_db)):
+    new_pool = Pool(length=length, width=width, depth=depth, manager_id=manager_id)
     db.add(new_pool)
     db.commit()
     db.refresh(new_pool) # after this refresh new_pool will get the id which is generated automaticlly in postgre table
-    return {"message": "Pool added successfully", "pool": new_pool}
+
+    # Convert new_pool to PoolSchema
+    pool_schema = PoolSchema(**new_pool.__dict__)
+
+
+    return PoolResponse(message="Pool added successfully", pool=pool_schema)
 
 @app.get("/get_pool/")
 async def get_pool(poolcode: int, db: Session = Depends(get_db)):
