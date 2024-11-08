@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Request,Depends
+from fastapi import FastAPI, Request, Depends, HTTPException
 from app.models.schema import Pool,Bracelet, Manager
 from app.database import get_db, Base, engine
-from sqlalchemy.orm import Session
-from app.models.models import PoolSchema, PoolResponse
+from app.models.models import *
+from app.routers.help_functions import *
 
 
 # Initialize  FastAPI
@@ -20,41 +20,93 @@ async def add_pool(length: float, width: float, depth: float, manager_id: int, d
     db.add(new_pool)
     db.commit()
     db.refresh(new_pool) # after this refresh new_pool will get the id which is generated automaticlly in postgre table
-
-    # Convert new_pool to PoolSchema
-    pool_schema = PoolSchema(**new_pool.__dict__)
-
-
-    return PoolResponse(message="Pool added successfully", pool=pool_schema)
+    response = PoolResponse(message = "pool was added", pool = PoolSchema.model_validate(new_pool))
+    return  response
 
 @app.get("/get_pool/")
 async def get_pool(poolcode: int, db: Session = Depends(get_db)):
-
     pool = db.get(Pool, poolcode)
-    if pool:
-        return {"message": "Pool found successfully", "pool": pool}
-    else:
-        return {"message" : "this pool not found "}
+    if pool is None:
+        raise HTTPException(status_code=404, detail="pool not found")
+    return {"message": "Pool found successfully", "pool": pool}
 
-@app.post("/addbracelet/")
+
+
+@app.post("/addbracelet/", response_model= braceletResponse)
 async def add_brac(customer_name: str, age: int, db: Session = Depends(get_db)):
     new_brac = Bracelet(customer_name=customer_name, age=age)
     db.add(new_brac)
     db.commit()
     db.refresh(new_brac)
 
-    return {"message: ": "bracelete was added sucessfulyy", "brac": new_brac}
+    response = braceletResponse(bracelet = braceletSchema.model_validate(new_brac))
+
+    return response
 
 
 
-
-@app.post("/addmanager/")
+@app.post("/addmanager/", response_model= managerResponse)
 async def add_manager(name: str, age: int, salary: int, db: Session = Depends(get_db)):
-    manager = Manager( name=name, age=age, salary=salary)
-    db.add(manager)
+    new_manager = Manager(name=name, age=age, salary=salary)
+    db.add(new_manager)
     db.commit()
-    db.refresh(manager)
-    return {"managere addes successfuly":manager}
+    db.refresh(new_manager)
 
+    managerscema = managerResponse(manager= managerSchema.model_validate(new_manager))
+
+    return managerscema
+
+
+@app.delete("/deletabrac/{brac_code}")
+async  def delete_brac(brac_code: int, db: Session = Depends(get_db)):
+    brac = db.get(Bracelet, brac_code)
+
+    if brac is None:
+        raise HTTPException(status_code=404, detail="Bracelet not found")
+    db.delete(brac)
+    db.commit()
+
+    delete_bracelets_by_code(brac_code, db)
+    return {"detail": "Bracelet deleted successfully"}
+
+@app.delete("/deletpool/{pool_id}")
+async  def delete_brac(pool_id: int, db: Session = Depends(get_db)):
+    pool = db.get(Pool, pool_id)
+
+    if pool is None:
+        raise HTTPException(status_code=404, detail="Pool not found")
+    db.delete(pool)
+    db.commit()
+# you don’t need to pass session explicitly, Depends(get_db) will automatically handle it.
+    delete_rows_by_pool_id(pool_id, db)
+
+    return {"detail": "Pool deleted successfully"}
+
+
+@app.delete("/deletmanager/{manager_id}")
+async  def delete_brac(manager_id: int, db: Session = Depends(get_db)):
+    mang = db.get(Manager ,manager_id)
+
+    if mang is None:
+        raise HTTPException(status_code=404, detail="manager not found")
+    db.delete(mang)
+    db.commit()
+    return {"detail": "mnager deleted successfully"}
+
+
+@app.post("/connect_bracelet_to_pool")
+async def connect_bracelet_to_pool(pool_id: int, bracelet_code:int, db: Session = Depends(get_db)):
+    pool = db.get(Pool, pool_id)
+    if pool is None:
+        raise HTTPException(status_code=404, detail="pool not found")
+    bracelet = db.get(Bracelet,bracelet_code)
+    if bracelet is None:
+        raise HTTPException(status_code=404, detail="bracelet not found")
+
+    if bracelet not in pool.my_braces:
+        pool.my_braces.append(bracelet)
+        db.commit()
+
+    return {"message": f"bracelet '{bracelet.customer_name}' connected to pool '{pool.id}'"}
 
 

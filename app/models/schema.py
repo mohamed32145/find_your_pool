@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey, Table
+from  sqlalchemy.orm import relationship
 from app.database  import Base  # Assuming you have a Base defined in your database module
 
 class Pool(Base):
@@ -9,6 +10,7 @@ class Pool(Base):
     width = Column(Integer)
     depth = Column(Integer)
     manager_id= Column(Integer)  # Foreign key to manager if needed
+    my_braces = relationship("Bracelet", secondary= "bracelets_pools", back_populates="my_pools")
 
     def __repr__(self):
         return f"<Pool(length={self.length}, width={self.width}, depth={self.depth}, manager_id={self.manager_id})>"
@@ -21,6 +23,7 @@ class Bracelet(Base):
     code = Column(Integer, primary_key=True, index = True)
     customer_name = Column(String)
     age = Column(Integer)
+    my_pools = relationship("Pool", secondary="bracelets_pools", back_populates= "my_braces")
 
     def __repr__(self):
         return f" bracelet is [the code is {self.code}, the name is {self.customer_name} ,the age is {self.age}"
@@ -34,6 +37,11 @@ class Manager(Base):
     salary = Column(Integer)
 
 
-
+bracelets_pools = Table(
+    'bracelets_pools',
+    Base.metadata,
+    Column('bracelet_code', Integer, ForeignKey('bracelets.code'), primary_key=True),
+    Column('pool_id', Integer, ForeignKey('pools.id'), primary_key=True)
+)
 
 
