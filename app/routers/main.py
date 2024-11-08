@@ -15,8 +15,8 @@ def startup_event():
 
 
 @app.post("/add_pool/", response_model= PoolResponse)
-async def add_pool(length: float, width: float, depth: float, manager_id: int, db: Session = Depends(get_db)):
-    new_pool = Pool(length=length, width=width, depth=depth, manager_id=manager_id)
+async def add_pool(length: float, width: float, depth: float,  db: Session = Depends(get_db)):
+    new_pool = Pool(length=length, width=width, depth=depth)
     db.add(new_pool)
     db.commit()
     db.refresh(new_pool) # after this refresh new_pool will get the id which is generated automaticlly in postgre table
@@ -79,8 +79,10 @@ async  def delete_brac(pool_id: int, db: Session = Depends(get_db)):
     db.commit()
 # you don’t need to pass session explicitly, Depends(get_db) will automatically handle it.
     delete_rows_by_pool_id(pool_id, db)
+    delete_pool_from_pool_manager_table(pool_id, db)
 
     return {"detail": "Pool deleted successfully"}
+
 
 
 @app.delete("/deletmanager/{manager_id}")
@@ -91,6 +93,10 @@ async  def delete_brac(manager_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="manager not found")
     db.delete(mang)
     db.commit()
+    delete_manager_by_id_from_manager_pool(manager_id, db)
+
+
+
     return {"detail": "mnager deleted successfully"}
 
 
@@ -110,3 +116,17 @@ async def connect_bracelet_to_pool(pool_id: int, bracelet_code:int, db: Session 
     return {"message": f"bracelet '{bracelet.customer_name}' connected to pool '{pool.id}'"}
 
 
+@app.post("/connect_bracelet_to_manager")
+async def connect_bracelet_to_manager(pool_id: int, manager_id:int, db: Session = Depends(get_db)):
+    pool = db.get(Pool, pool_id)
+    if pool is None:
+        raise HTTPException(status_code=404, detail="pool not found")
+    manager = db.get(Manager,manager_id)
+    if manager is None:
+        raise HTTPException(status_code=404, detail="manager not found")
+
+    if manager not in pool.my_manager:
+        pool.my_manager.append(manager)
+        db.commit()
+
+    return {"message": f"manager '{manager.name}' connected to pool '{pool.id}'"}

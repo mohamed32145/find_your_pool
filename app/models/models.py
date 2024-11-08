@@ -4,7 +4,6 @@ class PoolSchema(BaseModel):
     length: int
     width: int
     depth: int
-    manager_id: int
 
     class Config:
         orm_mode = True

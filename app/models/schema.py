@@ -9,8 +9,8 @@ class Pool(Base):
     length = Column(Integer)
     width = Column(Integer)
     depth = Column(Integer)
-    manager_id= Column(Integer)  # Foreign key to manager if needed
     my_braces = relationship("Bracelet", secondary= "bracelets_pools", back_populates="my_pools")
+    my_manager = relationship("Manager", secondary="managers_pools", back_populates= "my_pools")
 
     def __repr__(self):
         return f"<Pool(length={self.length}, width={self.width}, depth={self.depth}, manager_id={self.manager_id})>"
@@ -35,6 +35,7 @@ class Manager(Base):
     age = Column(Integer)
     name = Column(String)
     salary = Column(Integer)
+    my_pools = relationship("Pool", secondary="managers_pools", back_populates="my_manager")
 
 
 bracelets_pools = Table(
@@ -44,4 +45,11 @@ bracelets_pools = Table(
     Column('pool_id', Integer, ForeignKey('pools.id'), primary_key=True)
 )
 
+
+managers_pools = Table(
+    'managers_pools',
+    Base.metadata,
+    Column('manager_id', Integer, ForeignKey('managers.id'), primary_key=True),
+    Column('pool_id', Integer, ForeignKey('pools.id'), primary_key=True)
+)
 
