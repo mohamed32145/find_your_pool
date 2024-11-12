@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import  BaseModel
 
 class PoolSchema(BaseModel):
@@ -37,6 +38,7 @@ class managerResponse(BaseModel):
 class braceletSchema(BaseModel):
     customer_name : str
     age : int
+    register_at: datetime
 
     class Config:
         from_attributes = True

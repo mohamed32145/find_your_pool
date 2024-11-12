@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, ForeignKey, Table, TIMESTAMP, text
 from  sqlalchemy.orm import relationship
-from app.database  import Base  # Assuming you have a Base defined in your database module
+from app.database  import Base
+
 
 class Pool(Base):
     __tablename__ = 'pools'  # Define the table name
@@ -13,7 +14,7 @@ class Pool(Base):
     my_manager = relationship("Manager", secondary="managers_pools", back_populates= "my_pools")
 
     def __repr__(self):
-        return f"<Pool(length={self.length}, width={self.width}, depth={self.depth}, manager_id={self.manager_id})>"
+        return f"<Pool(length={self.length}, width={self.width}, depth={self.depth})>"
 
 
 
@@ -23,6 +24,7 @@ class Bracelet(Base):
     code = Column(Integer, primary_key=True, index = True)
     customer_name = Column(String)
     age = Column(Integer)
+    register_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     my_pools = relationship("Pool", secondary="bracelets_pools", back_populates= "my_braces")
 
     def __repr__(self):

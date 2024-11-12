@@ -9,6 +9,9 @@ from sqlalchemy.orm import Session
 #f you’re calling delete_rows_by_pool_id inside a FastAPI route, FastAPI will inject the session argument automatically
 # from the dependency injection (via Depends(get_db))
 def delete_rows_by_pool_id(pool_id_to_delete: int, session: Session = Depends(get_db)):
+    """"
+
+    """
     try:
         stmt = delete(bracelets_pools).where(bracelets_pools.c.pool_id == pool_id_to_delete)
         result = session.execute(stmt)
@@ -63,6 +66,15 @@ def delete_pool_from_pool_manager_table(pool_id_to_delete: int, session: Session
         # Roll back the changes if an error occurs
         session.rollback()
         print(f"Error deleting rows: {e}")
+
+
+#def show_my_manager(pool_id: int):
+
+
+#def show_pools_for_bracelet(bracelet_code: int):
+
+
+
 
 
 
