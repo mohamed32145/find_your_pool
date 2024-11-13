@@ -50,3 +50,23 @@ class braceletResponse(BaseModel):
         orm_mode = True
         from_attributes = True
 
+class ConnectBraceletManagerResponse(BaseModel):
+    message: str
+    pool_id: int
+    manager_name: str
+
+    class Config:
+        orm_mode = True
+
+
+class ConnectBraceletPoolResponse(BaseModel):
+    message: str
+    pool_id: int
+    bracelet_name: str
+
+    class Config:
+        orm_mode = True
+
+
+
+

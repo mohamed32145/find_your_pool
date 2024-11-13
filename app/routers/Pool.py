@@ -2,9 +2,8 @@ from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.help_functions import delete_rows_by_pool_id, delete_pool_from_pool_manager_table
-from app.models.models import PoolSchema, PoolResponse
-from app.models.schema import Pool
-
+from app.models.models import PoolSchema, PoolResponse, ConnectBraceletManagerResponse
+from app.models.schema import Pool, Manager
 
 router = APIRouter(
     prefix="/pool",
@@ -18,8 +17,8 @@ async def add_pool(length: float, width: float, depth: float,  db: Session = Dep
     db.add(new_pool)
     db.commit()
     db.refresh(new_pool) # after this refresh new_pool will get the id which is generated automaticlly in postgre table
-    response = PoolResponse(message = "pool was added", pool = PoolSchema.model_validate(new_pool))
-    return  response
+    response = PoolResponse(message="pool was added", pool=PoolSchema.model_validate(new_pool))
+    return response
 
 @router.get("/get_pool", response_model=PoolResponse)
 async def get_pool(poolcode: int, db: Session = Depends(get_db)):
@@ -44,3 +43,20 @@ async  def delete_brac(pool_id: int, db: Session = Depends(get_db)):
     delete_pool_from_pool_manager_table(pool_id, db)
 
     return {"detail": "Pool deleted successfully"}
+
+@router.post("/connect_pool_to_manager",response_model= ConnectBraceletManagerResponse)
+async def connect_bracelet_to_manager(pool_id: int, manager_id:int, db: Session = Depends(get_db)):
+    pool = db.get(Pool, pool_id)
+    if pool is None:
+        raise HTTPException(status_code=404, detail="pool not found")
+    manager = db.get(Manager,manager_id)
+    if manager is None:
+        raise HTTPException(status_code=404, detail="manager not found")
+
+    if manager not in pool.my_manager:
+        pool.my_manager.append(manager)
+        db.commit()
+
+    return ConnectBraceletManagerResponse(message=f"Manager '{manager.name}' connected to pool '{pool.id}'",pool_id=pool.id,
+        manager_name=manager.name
+    )
