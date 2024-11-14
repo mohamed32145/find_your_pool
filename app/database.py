@@ -1,9 +1,15 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+import os
 
-DATABASE_URL = "postgresql://postgres:123987zxcoiu@db:5432/pools_mall"
 
+
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 # Set up the database engine
 engine = create_engine(DATABASE_URL)
 
