@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, APIRouter
+from fastapi import Depends, HTTPException, APIRouter,status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.help_functions import delete_rows_by_pool_id, delete_pool_from_pool_manager_table
@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 
-@router.post("/add_pool", response_model= PoolResponse)
+@router.post("/add_pool", response_model= PoolResponse,status_code=status.HTTP_201_CREATED)
 async def add_pool(length: float, width: float, depth: float,  db: Session = Depends(get_db)):
     new_pool = Pool(length=length, width=width, depth=depth)
     db.add(new_pool)
@@ -28,6 +28,62 @@ async def get_pool(poolcode: int, db: Session = Depends(get_db)):
     response = PoolResponse(message="this is the pool ", pool=PoolSchema.model_validate(pool))
     return response
 
+
+@router.get("/show_my_manager")
+async def show_manager(poolCode: int, db: Session = Depends(get_db)):
+    pool = db.get(Pool, poolCode)
+    if pool is None:
+        raise HTTPException(status_code=404, detail="Pool not found")
+
+    if pool.my_manager:
+        return {
+            "pool_id": pool.id,
+            "manager": {
+                "id": pool.my_manager.id,
+                "name": pool.my_manager.name
+            }
+        }
+    else:
+        return {"detail": f"No manager yet for this pool with id {pool.id}"}
+
+
+@router.get("/show_my_bracelets")
+async  def show_bracelets(poolCode: int, db: Session = Depends(get_db)):
+    pool = db.get(Pool, poolCode)
+    if pool is None:
+        raise HTTPException(status_code=404, detail="Pool not found")
+    bracelets = [{"bars_code": brac.code, "name": brac.customer_name} for brac in pool.my_braces]
+    return {
+        "pool_id": pool.id,
+        "bracelets": bracelets
+    }
+
+
+@router.delete("/delete_bracelet_from_pool")
+async def delete_bracelet_from_pool(pool_id: int, bracelet_code: int, db: Session = Depends(get_db)):
+
+    # Get the pool
+    pool = db.get(Pool, pool_id)
+    if pool is None:
+        raise HTTPException(status_code=404, detail="Pool not found")
+
+    # Find the bracelet in the pool's list of associated bracelets
+    bracelet_to_remove = next((bracelet for bracelet in pool.my_braces if bracelet.code == bracelet_code), None)
+
+    if bracelet_to_remove is None:
+        raise HTTPException(status_code=404, detail="Bracelet not found in this pool")
+
+    # Remove the bracelet from the pool
+    pool.my_braces.remove(bracelet_to_remove)
+
+    # Commit the changes
+    db.add(pool)
+    db.commit()
+    db.refresh(pool)
+
+    return {
+        "message": f"Bracelet with ID {bracelet_code} has been removed from pool {pool_id}"
+    }
 
 
 @router.delete("/deletpool/{pool_id}")
@@ -53,9 +109,18 @@ async def connect_bracelet_to_manager(pool_id: int, manager_id:int, db: Session 
     if manager is None:
         raise HTTPException(status_code=404, detail="manager not found")
 
-    if manager not in pool.my_manager:
-        pool.my_manager.append(manager)
-        db.commit()
+        # Check if the pool already has a manager
+    if pool.my_manager is not None:
+        return {"message": f"There is already a manager assigned to pool {pool.id}"}
+
+        # Assign the Manager object to the Poo
+    pool.my_manager = manager
+
+    # Commit  changes to the database
+    db.add(pool)
+    db.commit()
+    db.refresh(pool)
+
 
     return ConnectBraceletManagerResponse(message=f"Manager '{manager.name}' connected to pool '{pool.id}'",pool_id=pool.id,
         manager_name=manager.name

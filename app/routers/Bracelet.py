@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, APIRouter
+from fastapi import Depends, HTTPException, APIRouter,status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.help_functions import delete_bracelets_by_code
@@ -14,7 +14,7 @@ router = APIRouter(
 )
 
 
-@router.post("/addbracelet", response_model= braceletResponse)
+@router.post("/addbracelet", response_model= braceletResponse,status_code=status.HTTP_201_CREATED)
 async def add_brac(customer_name: str, age: int, db: Session = Depends(get_db)):
     new_brac = Bracelet(customer_name=customer_name, age=age)
     db.add(new_brac)
@@ -40,13 +40,17 @@ async  def delete_brac(brac_code: int, db: Session = Depends(get_db)):
     return {"detail": "Bracelet deleted successfully"}
 
 
-@router.get("/showProfile/{brac_code}")
+@router.get("/show_registerd_pools/{brac_code}")
 async  def show_profile(brac_code: int, db: Session = Depends(get_db)):
     brac = db.get(Bracelet, brac_code)
-
-
-
-
+    if brac is None:
+        raise HTTPException(status_code=404, detail="Bracelet not found")
+    pools = [{"id": pool.id, "length": pool.length, "width": pool.width, "depth": pool.depth} for pool in
+             brac.my_pools]
+    return {
+        "customer_name": brac.customer_name,
+        "entered pools": pools
+    }
 
 
 @router.post("/connect_bracelet_to_pool", response_model=ConnectBraceletPoolResponse)

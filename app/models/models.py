@@ -1,5 +1,6 @@
 from datetime import datetime
-from pydantic import  BaseModel
+from pydantic import  BaseModel,EmailStr
+
 
 class PoolSchema(BaseModel):
     length: int
@@ -21,17 +22,24 @@ class managerSchema(BaseModel):
     age: int
     name: str
     salary: int
+    email: EmailStr
+    password: str
 
     class Config:
         orm_mode = True
         from_attributes = True
 
 
-class managerResponse(BaseModel):
-    manager : managerSchema
+class ManagerResponseWithoutSensitive(BaseModel):
+    id: int
+    name: str
+    age: int
+    email: EmailStr
 
     class Config:
         orm_mode = True
+
+
 
 
 

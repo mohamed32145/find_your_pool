@@ -11,7 +11,8 @@ class Pool(Base):
     width = Column(Integer)
     depth = Column(Integer)
     my_braces = relationship("Bracelet", secondary= "bracelets_pools", back_populates="my_pools")
-    my_manager = relationship("Manager", secondary="managers_pools", back_populates= "my_pools")
+    manager_id = Column(Integer, ForeignKey('managers.id'))  # One manager per pool
+    my_manager = relationship("Manager", back_populates="my_pools")  # Pool -> Manager (one-to-many)
 
     def __repr__(self):
         return f"<Pool(length={self.length}, width={self.width}, depth={self.depth})>"
@@ -37,7 +38,9 @@ class Manager(Base):
     age = Column(Integer)
     name = Column(String)
     salary = Column(Integer)
-    my_pools = relationship("Pool", secondary="managers_pools", back_populates="my_manager")
+    email = Column(String, nullable=False, unique=True)
+    password = Column(String, nullable=False)
+    my_pools = relationship("Pool", back_populates="my_manager")  # One-to-many relationship
 
 
 bracelets_pools = Table(
