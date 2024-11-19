@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.help_functions import delete_bracelets_by_code
 from app.models.models import braceletResponse, braceletSchema, ConnectBraceletPoolResponse
-from app.models.schema import Bracelet, Pool, Manager
+from app.models.schema import Bracelet, Pool
 
 
 router = APIRouter(

@@ -4,7 +4,10 @@ from app.models.schema import bracelets_pools, managers_pools
 from app.database import get_db
 from sqlalchemy import delete
 from sqlalchemy.orm import Session
+from passlib.context import CryptContext
 
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated = "auto")
 
 #f you’re calling delete_rows_by_pool_id inside a FastAPI route, FastAPI will inject the session argument automatically
 # from the dependency injection (via Depends(get_db))
@@ -68,10 +71,8 @@ def delete_pool_from_pool_manager_table(pool_id_to_delete: int, session: Session
         print(f"Error deleting rows: {e}")
 
 
-#def show_my_manager(pool_id: int):
-
-
-#def show_pools_for_bracelet(bracelet_code: int):
+def hash(password: str):
+    return pwd_context.hash(password)
 
 
 

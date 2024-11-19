@@ -4,6 +4,9 @@ from app.database import get_db
 from app.help_functions import delete_manager_by_id_from_manager_pool
 from app.models.models import  managerSchema, ManagerResponseWithoutSensitive
 from app.models.schema import  Manager
+from app.help_functions import hash
+
+
 
 
 
@@ -12,9 +15,12 @@ router = APIRouter(
     tags=['Manager']
 )
 
+
+
 @router.post("/addmanager", response_model= ManagerResponseWithoutSensitive,status_code=status.HTTP_201_CREATED)
 async def add_manager(name: str, age: int, salary: int,email: str, password: str ,db: Session = Depends(get_db)):
-    new_manager = Manager(name=name, age=age, salary=salary, email= email, password= password)
+    hashed_password = hash(password)
+    new_manager = Manager(name=name, age=age, salary=salary, email= email, password= hashed_password)
     db.add(new_manager)
     db.commit()
     db.refresh(new_manager)
