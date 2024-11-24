@@ -4,7 +4,7 @@ from app.database import get_db
 from app.help_functions import delete_manager_by_id_from_manager_pool
 from app.models.models import  managerSchema, ManagerResponseWithoutSensitive
 from app.models.schema import  Manager
-from app.help_functions import hash
+from app.help_functions import hash, verify,create_access_token
 
 
 
@@ -59,3 +59,20 @@ async def manager_pools(manager_id: int, db: Session = Depends(get_db)):
         "manager_name": manager.name,
         "pools": pools
     }
+
+@router.post('/login')
+async def login(email:str, password:str ,db: Session = Depends(get_db)):
+    manager=db.query(Manager).filter(Manager.email == email).first()
+    if not manager:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invalid login information")
+
+    if not verify(password, manager.password):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invalid login information")
+    # create the token
+    access_token = create_access_token(data={"email": email})
+    #return token
+    return {"ccess_token": access_token,"token_type": "bearer"}
+
+
+
+
