@@ -19,7 +19,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
-oauth2_schema = OAuth2PasswordBearer(tokenUrl='login')
+oauth2_schema = OAuth2PasswordBearer(tokenUrl= "manager/login")
 
 
 #f you’re calling delete_rows_by_pool_id inside a FastAPI route, FastAPI will inject the session argument automatically

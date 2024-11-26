@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, APIRouter,status
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.help_functions import delete_bracelets_by_code
+from app.help_functions import delete_bracelets_by_code,get_current_user
 from app.models.models import braceletResponse, braceletSchema, ConnectBraceletPoolResponse
 from app.models.schema import Bracelet, Pool
 
@@ -24,7 +24,6 @@ async def add_brac(customer_name: str, age: int, db: Session = Depends(get_db)):
     response = braceletResponse(bracelet = braceletSchema.model_validate(new_brac))
 
     return response
-
 
 
 @router.delete("/deletabrac/{brac_code}")

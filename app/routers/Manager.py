@@ -63,15 +63,23 @@ async def manager_pools(manager_id: int, db: Session = Depends(get_db)):
 @router.post('/login')
 async def login(email:str, password:str ,db: Session = Depends(get_db)):
     manager=db.query(Manager).filter(Manager.email == email).first()
+
+    password = password.strip()
+
+    print(f"Password entered: {password}")
+    print(f"Stored hashed password: {manager.password}")
+    print(f"Password valid: {verify(password, manager.password)}")
+
+
     if not manager:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invalid login information")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="invalid login information")
 
     if not verify(password, manager.password):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invalid login information")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="invalid login information")
     # create the token
     access_token = create_access_token(data={"email": email})
     #return token
-    return {"ccess_token": access_token,"token_type": "bearer"}
+    return {"access_token": access_token,"token_type": "bearer"}
 
 
 

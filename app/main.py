@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.security import OAuth2PasswordBearer
 
 from app.database import Base, engine
 from app.routers import Pool, Manager, Bracelet
@@ -6,6 +7,7 @@ from app.routers import Pool, Manager, Bracelet
 
 
 
+oauth2_schema = OAuth2PasswordBearer(tokenUrl="manager/login")
 
 
 # Initialize  FastAPI

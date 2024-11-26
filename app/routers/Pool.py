@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, APIRouter,status
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.help_functions import delete_rows_by_pool_id, delete_pool_from_pool_manager_table
+from app.help_functions import delete_rows_by_pool_id, delete_pool_from_pool_manager_table,get_current_user
 from app.models.models import PoolSchema, PoolResponse, ConnectBraceletManagerResponse
 from app.models.schema import Pool, Manager
 
@@ -21,7 +21,8 @@ async def add_pool(length: float, width: float, depth: float,  db: Session = Dep
     return response
 
 @router.get("/get_pool", response_model=PoolResponse)
-async def get_pool(poolcode: int, db: Session = Depends(get_db)):
+async def get_pool(poolcode: int, db: Session = Depends(get_db), get_current_user: int =
+                   Depends(get_current_user)):
     pool = db.get(Pool, poolcode)
     if pool is None:
         raise HTTPException(status_code=404, detail="pool not found")
